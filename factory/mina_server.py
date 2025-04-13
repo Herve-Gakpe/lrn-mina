@@ -4,6 +4,7 @@
 from flask import Flask, request, jsonify
 import subprocess
 import json
+import os
 
 app = Flask(__name__)
 
@@ -20,8 +21,9 @@ def process_video():
         return jsonify({"error": "Missing 'url' in request body"}), 400
 
     try:
+        script_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "download_and_process.py"))
         result = subprocess.run(
-            ["python3", "download_and_process.py", url],
+            ["python", script_path, url],
             capture_output=True,
             text=True
         )
