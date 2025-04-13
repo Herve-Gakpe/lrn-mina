@@ -5,7 +5,10 @@ from typing import Dict, Any
 from urllib.parse import parse_qs, urlparse
 import pytesseract
 from PIL import Image
-from fusion_ocr_whisper import merge_data
+from factory.fusion_ocr_whisper import merge_data
+
+# Base directory for all file operations
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def get_video_id(url: str) -> str:
     """Extract video ID from YouTube URL."""
@@ -23,10 +26,11 @@ def download_video(url: str) -> str:
     Returns the path to the downloaded file.
     """
     video_id = get_video_id(url)
-    output_template = f"downloads/{video_id}/%(title)s.%(ext)s"
+    downloads_dir = os.path.join(BASE_DIR, "downloads", video_id)
+    output_template = os.path.join(downloads_dir, "%(title)s.%(ext)s")
     
     # Create downloads directory if it doesn't exist
-    os.makedirs(f"downloads/{video_id}", exist_ok=True)
+    os.makedirs(downloads_dir, exist_ok=True)
     
     # Download video using yt-dlp
     cmd = [
@@ -38,12 +42,11 @@ def download_video(url: str) -> str:
     subprocess.run(cmd, check=True)
     
     # Get the downloaded file path (should be only one file)
-    video_dir = f"downloads/{video_id}"
-    files = os.listdir(video_dir)
+    files = os.listdir(downloads_dir)
     if not files:
         raise FileNotFoundError("Video download failed")
     
-    return os.path.join(video_dir, files[0])
+    return os.path.join(downloads_dir, files[0])
 
 def transcribe_video(video_path: str) -> str:
     """
@@ -79,7 +82,7 @@ def extract_frames(video_path: str) -> str:
         "-i", video_path,
         "-vf", "fps=1/4",
         "-frame_pts", "1",
-        f"{frames_dir}/frame_%04d.jpg"
+        os.path.join(frames_dir, "frame_%04d.jpg")
     ]
     subprocess.run(cmd, check=True)
     
@@ -98,7 +101,6 @@ def process_frames_ocr(frames_dir: str) -> Dict[str, str]:
             
         frame_path = os.path.join(frames_dir, frame)
         try:
-            # Perform OCR using pytesseract
             image = Image.open(frame_path)
             text = pytesseract.image_to_string(image, lang='fra')
             ocr_results[frame] = text.strip()
@@ -168,7 +170,11 @@ def full_pipeline(video_url: str) -> Dict[str, Any]:
         }
 
 if __name__ == "__main__":
-    # Example usage
-    video_url = "https://www.youtube.com/watch?v=example"
+    import sys
+    if len(sys.argv) != 2:
+        print("Usage: python download_and_process.py <youtube_url>")
+        sys.exit(1)
+        
+    video_url = sys.argv[1]
     result = full_pipeline(video_url)
     print(json.dumps(result, indent=2))
