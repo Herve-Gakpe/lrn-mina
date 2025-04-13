@@ -1,0 +1,40 @@
+[
+  
+
+  {
+    "start": 144.0,
+    "end": 147.0,
+    "text_whisper": "Bon après-midi, bonjour.",
+    "text_ocr": "",
+    "text_mina": "bôju",
+    "text_fr": "Bonjour",
+    "note": "salutations"
+  },
+  {
+    "start": 147.0,
+    "end": 150.0,
+    "text_whisper": "Bonsoir, bonsoir.",
+    "text_ocr": "goniour - bôju\nBON APRÈS-MIDI = bôju\n8onsor - bOSOaà\n\nSALUT, COMMENT VAS-TU / ALLEZ-VOUS? = O foa fl\n\nccommenr vas-ru /auezvous:- leko F do?",
+    "text_mina": "bOSOa",
+    "text_fr": "Bonsoir",
+    "note": "salutations"
+  },
+  {
+    "start": 150.0,
+    "end": 153.0,
+    "text_whisper": "Salut, au fond.",
+    "text_ocr": "goniour - bôju\nBON APRÈS-MIDI = bôju\n8onsor - bOSOaà\n\nSALUT, COMMENT VAS-TU / ALLEZ-VOUS? = O foa fl\n\nccommenr vas-ru /auezvous:- leko F do?",
+    "text_mina": "O foa",
+    "text_fr": "Salut",
+    "note": "salutations"
+  },
+  {
+    "start": 153.0,
+    "end": 155.0,
+    "text_whisper": "Comment allez-vous?",
+    "text_ocr": "gonjour - bôju\nBON APRÈS-MIDI = bôj u\nsonsor - bOSOaà\n\nSALUT, COMMENT VAS-TU / ALLEZ-VOUS? = O foa ?\n\nCCOMMENT VAS-TU / ALLEZ-VOUS? = leko fà do?",
+    "text_mina": "leko fà do?",
+    "text_fr": "Comment allez-vous ?",
+    "note": "salutations"
+  }
+]
