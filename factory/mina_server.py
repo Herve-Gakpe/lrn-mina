@@ -7,6 +7,10 @@ import json
 
 app = Flask(__name__)
 
+@app.route("/")
+def health_check():
+    return "✅ LRN-MINA server is running"
+
 @app.route("/process", methods=["POST"])
 def process_video():
     data = request.get_json()
