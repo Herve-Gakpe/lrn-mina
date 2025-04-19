@@ -1,5 +1,6 @@
 import os
 import json
+import sys
 import subprocess
 from typing import Dict, Any
 from urllib.parse import parse_qs, urlparse
@@ -39,7 +40,11 @@ def download_video(url: str) -> str:
         "-o", output_template,
         url
     ]
-    subprocess.run(cmd, check=True)
+    try:
+        subprocess.run(cmd, check=True, capture_output=True, text=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Error downloading video: {e.stderr}", file=sys.stderr)
+        raise
     
     # Get the downloaded file path (should be only one file)
     files = os.listdir(downloads_dir)
@@ -65,7 +70,11 @@ def transcribe_video(video_path: str) -> str:
         "--output_format", "json",
         "--output_dir", output_dir
     ]
-    subprocess.run(cmd, check=True)
+    try:
+        subprocess.run(cmd, check=True, capture_output=True, text=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Error transcribing video: {e.stderr}", file=sys.stderr)
+        raise
     
     return output_path
 
@@ -84,7 +93,11 @@ def extract_frames(video_path: str) -> str:
         "-frame_pts", "1",
         os.path.join(frames_dir, "frame_%04d.jpg")
     ]
-    subprocess.run(cmd, check=True)
+    try:
+        subprocess.run(cmd, check=True, capture_output=True, text=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Error extracting frames: {e.stderr}", file=sys.stderr)
+        raise
     
     return frames_dir
 
@@ -105,7 +118,7 @@ def process_frames_ocr(frames_dir: str) -> Dict[str, str]:
             text = pytesseract.image_to_string(image, lang='fra')
             ocr_results[frame] = text.strip()
         except Exception as e:
-            print(f"Error processing frame {frame}: {e}")
+            print(f"Error processing frame {frame}: {e}", file=sys.stderr)
             ocr_results[frame] = ""
     
     return ocr_results
@@ -170,9 +183,8 @@ def full_pipeline(video_url: str) -> Dict[str, Any]:
         }
 
 if __name__ == "__main__":
-    import sys
     if len(sys.argv) != 2:
-        print("Usage: python download_and_process.py <youtube_url>")
+        print("Usage: python download_and_process.py <youtube_url>", file=sys.stderr)
         sys.exit(1)
         
     video_url = sys.argv[1]

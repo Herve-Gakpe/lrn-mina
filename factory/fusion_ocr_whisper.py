@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 from typing import Dict, List, Any
 
 # Base directory for all file operations
@@ -111,7 +112,7 @@ def merge_data(
                     "frame": frame_filename
                 })
             except (KeyError, ValueError) as e:
-                print(f"Warning: Skipping invalid segment: {e}")
+                print(f"Warning: Skipping invalid segment: {e}", file=sys.stderr)
                 continue
 
         if not output:
@@ -126,8 +127,6 @@ def merge_data(
                 json.dump(output, f, indent=2, ensure_ascii=False)
         except Exception as e:
             raise FusionError(f"Error saving output file: {e}")
-
-        print(f"✅ Fusion OCR + Whisper terminée. Fichier généré : {output_path}")
         
     except FusionError as e:
         raise
@@ -143,5 +142,5 @@ if __name__ == "__main__":
             frame_rate=DEFAULT_FRAME_RATE
         )
     except FusionError as e:
-        print(f"❌ Erreur: {e}")
+        print(f"❌ Erreur: {e}", file=sys.stderr)
         exit(1)
