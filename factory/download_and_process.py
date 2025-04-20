@@ -47,7 +47,16 @@ def download_video(url: str) -> str:
         url
     ]
     try:
-        subprocess.run(cmd, check=True, capture_output=True, text=True)
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        if result.returncode != 0:
+            print(f"yt-dlp error details:", file=sys.stderr)
+            print(f"Command: {' '.join(cmd)}", file=sys.stderr)
+            print(f"Exit code: {result.returncode}", file=sys.stderr)
+            print(f"stdout: {result.stdout}", file=sys.stderr)
+            print(f"stderr: {result.stderr}", file=sys.stderr)
+            raise subprocess.CalledProcessError(
+                result.returncode, cmd, result.stdout, result.stderr
+            )
     except subprocess.CalledProcessError as e:
         print(f"Error downloading video: {e.stderr}", file=sys.stderr)
         raise
