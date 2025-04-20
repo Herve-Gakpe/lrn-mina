@@ -6,6 +6,12 @@ from typing import Dict, Any
 from urllib.parse import parse_qs, urlparse
 import pytesseract
 from PIL import Image
+
+# 🛠️ Fix for module import when executed by Render or other external runners
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if BASE_DIR not in sys.path:
+    sys.path.insert(0, BASE_DIR)
+
 from factory.fusion_ocr_whisper import merge_data
 
 # Base directory for all file operations
