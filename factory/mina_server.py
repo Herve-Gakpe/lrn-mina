@@ -50,6 +50,7 @@ def process_video() -> Dict[str, Any]:
             ["python", script_path, url],
             capture_output=True,
             text=True,
+            encoding="utf-8",
             cwd=BASE_DIR  # Ensure script runs from project root
         )
 
@@ -64,11 +65,23 @@ def process_video() -> Dict[str, Any]:
 
         # Parse and return the output
         try:
-            logger.warning(f"Script raw stdout: {result.stdout}")
-            output_json = json.loads(result.stdout)
-            logger.info(f"Successfully processed video: {output_json.get('video_id', 'unknown')}")
-            return jsonify(output_json)
-        except json.JSONDecodeError as e:
+            # Clean and inspect stdout before parsing
+            cleaned_stdout = result.stdout.strip()
+            logger.warning(f"🧪 Cleaned stdout preview: {repr(cleaned_stdout[:300])}")
+            
+            try:
+                output_json = json.loads(cleaned_stdout)
+                logger.info(f"Successfully processed video: {output_json.get('video_id', 'unknown')}")
+                return jsonify(output_json)
+            except json.JSONDecodeError as e:
+                logger.error(f"❌ JSON decode failed: {e}")
+                logger.error(f"💥 Full raw stdout:\n{result.stdout}")
+                return jsonify({
+                    "error": "Invalid JSON from script",
+                    "details": str(e)
+                }), 500
+
+        except Exception as e:
             logger.error(f"Failed to parse script output: {e}")
             logger.error(f"Script stdout: {result.stdout}")
             return jsonify({
